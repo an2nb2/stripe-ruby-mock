@@ -50,6 +50,23 @@ shared_examples 'Recipient API' do
     expect(recipient.email).to eq(original.email)
   end
 
+  it "updates a stripe recipient" do
+    original = Stripe::Recipient.create({
+      type:  "individual",
+      name: "Bob",
+      email: "bob@example.com"
+    })
+    original.name = "Rob"
+    original.email = "rob@example.com"
+    original.save
+    
+    recipient = Stripe::Recipient.retrieve(original.id)
+
+    expect(recipient.id).to eq(original.id)
+    expect(recipient.name).to eq("Rob")
+    expect(recipient.email).to eq("rob@example.com")
+  end
+
   it "cannot retrieve a recipient that doesn't exist" do
     expect { Stripe::Recipient.retrieve('nope') }.to raise_error {|e|
       expect(e).to be_a Stripe::InvalidRequestError
